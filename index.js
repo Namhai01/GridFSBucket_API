@@ -12,6 +12,10 @@ app.use(cors());
 // Router
 app.use("/api/file", file);
 
+app.get("/", (req, res) => {
+  res.sendFile(__dirname + "/index.html");
+});
+
 //Check Connect to Mongodb
 const connect = async () => {
   try {
