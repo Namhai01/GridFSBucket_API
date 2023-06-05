@@ -9,7 +9,10 @@ const conn = mongoose.createConnection(process.env.MONGODB, (error) => {
 });
 let gfs;
 conn.once("open", () => {
-  gfs = new mongoose.mongo.GridFSBucket(conn.db, { bucketName: "images" });
+  gfs = new mongoose.mongo.GridFSBucket(conn.db, {
+    bucketName: "images",
+    chunkSizeBytes: 1024 * 1024,
+  });
 });
 //ok
 const upload = async (req, res) => {
@@ -25,9 +28,12 @@ const getfile = async (req, res) => {
   try {
     const fileName = String(req.params.filename);
     const file = await gfs
-      .find({
-        filename: fileName,
-      })
+      .find(
+        {
+          filename: fileName,
+        },
+        { batchSize: 1 }
+      )
       .toArray();
     if (file.length > 0) {
       if (file.contentType === "image/png" || "image/jpg") {
